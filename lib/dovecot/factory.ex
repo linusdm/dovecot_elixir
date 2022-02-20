@@ -26,4 +26,10 @@ defmodule Dovecot.Factory do
       name: "some name"
     }
   end
+
+  def rayon_factory do
+    %Dovecot.Rayons.Rayon{
+      name: sequence(:rayon_name, &"some name#{&1}")
+    }
+  end
 end
