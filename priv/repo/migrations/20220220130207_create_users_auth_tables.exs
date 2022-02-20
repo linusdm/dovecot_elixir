@@ -9,6 +9,7 @@ defmodule Dovecot.Repo.Migrations.CreateUsersAuthTables do
       add :email, :citext, null: false
       add :hashed_password, :string, null: false
       add :confirmed_at, :naive_datetime
+      add :loft_id, references(:lofts, type: :binary_id, on_delete: :restrict)
       timestamps()
     end
 
