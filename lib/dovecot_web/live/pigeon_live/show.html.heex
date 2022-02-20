@@ -1,0 +1,31 @@
+<h1>Show Pigeon</h1>
+
+<%= if @live_action in [:edit] do %>
+  <.modal return_to={Routes.pigeon_show_path(@socket, :show, @pigeon)}>
+    <.live_component
+      module={DovecotWeb.PigeonLive.FormComponent}
+      id={@pigeon.id}
+      title={@page_title}
+      action={@live_action}
+      pigeon={@pigeon}
+      return_to={Routes.pigeon_show_path(@socket, :show, @pigeon)}
+    />
+  </.modal>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Ring:</strong>
+    <%= @pigeon.ring %>
+  </li>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @pigeon.name %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.pigeon_show_path(@socket, :edit, @pigeon), class: "button" %></span> |
+<span><%= live_redirect "Back", to: Routes.pigeon_index_path(@socket, :index) %></span>

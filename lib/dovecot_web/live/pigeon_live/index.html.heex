@@ -1,0 +1,41 @@
+<h1>Listing Pigeons</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <.modal return_to={Routes.pigeon_index_path(@socket, :index)}>
+    <.live_component
+      module={DovecotWeb.PigeonLive.FormComponent}
+      id={@pigeon.id || :new}
+      title={@page_title}
+      action={@live_action}
+      pigeon={@pigeon}
+      return_to={Routes.pigeon_index_path(@socket, :index)}
+    />
+  </.modal>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Ring</th>
+      <th>Name</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="pigeons">
+    <%= for pigeon <- @pigeons do %>
+      <tr id={"pigeon-#{pigeon.id}"}>
+        <td><%= pigeon.ring %></td>
+        <td><%= pigeon.name %></td>
+
+        <td>
+          <span><%= live_redirect "Show", to: Routes.pigeon_show_path(@socket, :show, pigeon) %></span>
+          <span><%= live_patch "Edit", to: Routes.pigeon_index_path(@socket, :edit, pigeon) %></span>
+          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: pigeon.id, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "New Pigeon", to: Routes.pigeon_index_path(@socket, :new) %></span>

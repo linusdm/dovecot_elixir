@@ -9,3 +9,10 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+import Dovecot.Factory
+
+loft = insert(:loft, %{name: "test loft"})
+
+insert(:user, %{email: "some@email.com", password: "hello Dovecot!", loft: loft})
+insert_list(10, :pigeon, %{loft_id: loft.id})
