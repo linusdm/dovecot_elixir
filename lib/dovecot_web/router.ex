@@ -90,14 +90,16 @@ defmodule DovecotWeb.Router do
     post "/users/confirm/:token", UserConfirmationController, :update
   end
 
-  scope "/", DovecotWeb do
-    pipe_through [:browser, :require_authenticated_user]
+  live_session :default, on_mount: DovecotWeb.UserLiveAuth do
+    scope "/", DovecotWeb do
+      pipe_through [:browser, :require_authenticated_user]
 
-    live "/pigeons", PigeonLive.Index, :index
-    live "/pigeons/new", PigeonLive.Index, :new
-    live "/pigeons/:id/edit", PigeonLive.Index, :edit
+      live "/pigeons", PigeonLive.Index, :index
+      live "/pigeons/new", PigeonLive.Index, :new
+      live "/pigeons/:id/edit", PigeonLive.Index, :edit
 
-    live "/pigeons/:id", PigeonLive.Show, :show
-    live "/pigeons/:id/show/edit", PigeonLive.Show, :edit
+      live "/pigeons/:id", PigeonLive.Show, :show
+      live "/pigeons/:id/show/edit", PigeonLive.Show, :edit
+    end
   end
 end

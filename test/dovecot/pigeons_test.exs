@@ -12,7 +12,8 @@ defmodule Dovecot.PigeonsTest do
 
     setup do
       loft = insert(:loft)
-      %{loft: loft, pigeon: insert(:pigeon, %{loft_id: loft.id})}
+      Dovecot.Repo.put_loft_id(loft.loft_id)
+      %{loft: loft, pigeon: insert(:pigeon, %{loft_id: loft.loft_id})}
     end
 
     test "list_pigeons/0 returns all pigeons", %{pigeon: pigeon} do
@@ -24,7 +25,7 @@ defmodule Dovecot.PigeonsTest do
     end
 
     test "create_pigeon/1 with valid data creates a pigeon", %{loft: loft} do
-      valid_attrs = params_for(:pigeon, %{loft_id: loft.id})
+      valid_attrs = params_for(:pigeon, %{loft_id: loft.loft_id})
 
       assert {:ok, %Pigeon{} = pigeon} = Pigeons.create_pigeon(valid_attrs)
       assert pigeon.ring == valid_attrs[:ring]

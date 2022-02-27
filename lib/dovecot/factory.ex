@@ -9,16 +9,11 @@ defmodule Dovecot.Factory do
         password: "ILoveDovecot4Ever!"
       }
       |> merge_attributes(attrs)
-      |> evaluate_lazy_attributes()
     )
     |> Ecto.Changeset.apply_changes()
   end
 
-  def loft_factory do
-    %Dovecot.Lofts.Loft{
-      name: "some loft"
-    }
-  end
+  def loft_factory, do: %Dovecot.Lofts.Loft{name: "some loft"}
 
   def pigeon_factory do
     %Dovecot.Pigeons.Pigeon{
@@ -27,9 +22,5 @@ defmodule Dovecot.Factory do
     }
   end
 
-  def rayon_factory do
-    %Dovecot.Rayons.Rayon{
-      name: sequence(:rayon_name, &"some name#{&1}")
-    }
-  end
+  def rayon_factory, do: %Dovecot.Rayons.Rayon{name: sequence(:rayon_name, &"some name#{&1}")}
 end

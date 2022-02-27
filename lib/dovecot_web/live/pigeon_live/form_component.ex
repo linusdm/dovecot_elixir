@@ -41,7 +41,7 @@ defmodule DovecotWeb.PigeonLive.FormComponent do
   end
 
   defp save_pigeon(socket, :new, pigeon_params) do
-    case Pigeons.create_pigeon(pigeon_params) do
+    case Pigeons.create_pigeon(Map.put(pigeon_params, "loft_id", Dovecot.Repo.get_loft_id())) do
       {:ok, _pigeon} ->
         {:noreply,
          socket

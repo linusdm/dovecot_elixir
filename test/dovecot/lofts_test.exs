@@ -15,9 +15,9 @@ defmodule Dovecot.LoftsTest do
       assert Lofts.list_lofts() == [loft]
     end
 
-    test "get_loft!/1 returns the loft with given id" do
+    test "get_loft!/1 returns the loft with given loft_id" do
       loft = loft_fixture()
-      assert Lofts.get_loft!(loft.id) == loft
+      assert Lofts.get_loft!(loft.loft_id) == loft
     end
 
     test "create_loft/1 with valid data creates a loft" do
@@ -42,13 +42,13 @@ defmodule Dovecot.LoftsTest do
     test "update_loft/2 with invalid data returns error changeset" do
       loft = loft_fixture()
       assert {:error, %Ecto.Changeset{}} = Lofts.update_loft(loft, @invalid_attrs)
-      assert loft == Lofts.get_loft!(loft.id)
+      assert loft == Lofts.get_loft!(loft.loft_id)
     end
 
     test "delete_loft/1 deletes the loft" do
       loft = loft_fixture()
       assert {:ok, %Loft{}} = Lofts.delete_loft(loft)
-      assert_raise Ecto.NoResultsError, fn -> Lofts.get_loft!(loft.id) end
+      assert_raise Ecto.NoResultsError, fn -> Lofts.get_loft!(loft.loft_id) end
     end
 
     test "change_loft/1 returns a loft changeset" do

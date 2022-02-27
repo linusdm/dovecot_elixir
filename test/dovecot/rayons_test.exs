@@ -12,7 +12,8 @@ defmodule Dovecot.RayonsTest do
 
     setup do
       loft = insert(:loft)
-      %{loft: loft, rayon: insert(:rayon, %{loft_id: loft.id})}
+      Dovecot.Repo.put_loft_id(loft.loft_id)
+      %{loft: loft, rayon: insert(:rayon, %{loft_id: loft.loft_id})}
     end
 
     test "list_rayons/0 returns all rayons", %{rayon: rayon} do
@@ -24,7 +25,7 @@ defmodule Dovecot.RayonsTest do
     end
 
     test "create_rayon/1 with valid data creates a rayon", %{loft: loft} do
-      valid_attrs = params_for(:rayon, %{loft_id: loft.id})
+      valid_attrs = params_for(:rayon, %{loft_id: loft.loft_id})
 
       assert {:ok, %Rayon{} = rayon} = Rayons.create_rayon(valid_attrs)
       assert rayon.name == valid_attrs[:name]

@@ -14,5 +14,6 @@ import Dovecot.Factory
 
 loft = insert(:loft, %{name: "test loft"})
 
-insert(:user, %{email: "some@email.com", password: "hello Dovecot!", loft: loft})
-insert_list(10, :pigeon, %{loft_id: loft.id})
+insert_list(10, :pigeon, %{loft_id: loft.loft_id})
+
+insert(:user, %{email: "some@email.com", password: "hello Dovecot!", loft_id: loft.loft_id})

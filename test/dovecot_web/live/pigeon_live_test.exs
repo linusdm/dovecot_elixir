@@ -7,9 +7,8 @@ defmodule DovecotWeb.PigeonLiveTest do
   @update_attrs %{name: "some updated name", ring: "some updated ring"}
   @invalid_attrs %{name: nil, ring: nil}
 
-  defp create_pigeon(_) do
-    loft = insert(:loft)
-    %{loft: loft, pigeon: insert(:pigeon, %{loft_id: loft.id})}
+  defp create_pigeon(%{user: user}) do
+    %{pigeon: insert(:pigeon, %{loft_id: user.loft_id})}
   end
 
   describe "Index" do
@@ -22,7 +21,7 @@ defmodule DovecotWeb.PigeonLiveTest do
       assert html =~ pigeon.name
     end
 
-    test "saves new pigeon", %{conn: conn, loft: loft} do
+    test "saves new pigeon", %{conn: conn} do
       {:ok, index_live, _html} = live(conn, Routes.pigeon_index_path(conn, :index))
 
       assert index_live |> element("a", "New Pigeon") |> render_click() =~
@@ -34,7 +33,7 @@ defmodule DovecotWeb.PigeonLiveTest do
              |> form("#pigeon-form", pigeon: @invalid_attrs)
              |> render_change() =~ "can&#39;t be blank"
 
-      create_attrs = params_for(:pigeon, %{loft_id: loft.id})
+      create_attrs = @update_attrs
 
       {:ok, _, html} =
         index_live

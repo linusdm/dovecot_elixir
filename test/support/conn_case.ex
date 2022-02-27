@@ -46,7 +46,8 @@ defmodule DovecotWeb.ConnCase do
   test context.
   """
   def register_and_log_in_user(%{conn: conn}) do
-    user = Dovecot.AccountsFixtures.user_fixture()
+    loft = Dovecot.Factory.insert(:loft)
+    user = Dovecot.AccountsFixtures.user_fixture(%{loft_id: loft.loft_id})
     %{conn: log_in_user(conn, user), user: user}
   end
 

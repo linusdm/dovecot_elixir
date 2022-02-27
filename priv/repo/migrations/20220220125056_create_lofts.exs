@@ -3,7 +3,7 @@ defmodule Dovecot.Repo.Migrations.CreateLofts do
 
   def change do
     create table(:lofts, primary_key: false) do
-      add :id, :binary_id, primary_key: true
+      add :loft_id, :binary_id, primary_key: true
       add :name, :string, null: false
 
       timestamps()

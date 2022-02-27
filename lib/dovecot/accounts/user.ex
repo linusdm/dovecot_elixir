@@ -8,7 +8,7 @@ defmodule Dovecot.Accounts.User do
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
-    belongs_to :loft, Dovecot.Lofts.Loft
+    field :loft_id, :binary_id
 
     timestamps()
   end
@@ -32,7 +32,7 @@ defmodule Dovecot.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :loft_id])
     |> validate_email()
     |> validate_password(opts)
   end
