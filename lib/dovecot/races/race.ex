@@ -19,6 +19,7 @@ defmodule Dovecot.Races.Race do
     race
     |> cast(attrs, [:loft_id, :name, :distance, :release_date, :release_time])
     |> validate_required([:loft_id, :name, :release_date])
+    |> validate_number(:distance, greater_than_or_equal_to: 1000, less_than_or_equal_to: 5_000_000)
     |> unique_constraint([:loft_id, :name, :release_date])
   end
 end

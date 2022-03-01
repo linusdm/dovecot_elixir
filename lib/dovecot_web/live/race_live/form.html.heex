@@ -12,12 +12,16 @@
   <%= error_tag f, :name %>
 
   <%= label f, :distance %>
-  <%= text_input f, :distance %>
+  <%= number_input f, :distance %>
   <%= error_tag f, :distance %>
 
   <%= label f, :release_date %>
-  <%= text_input f, :release_date %>
+  <%= date_input f, :release_date %>
   <%= error_tag f, :release_date %>
+
+  <%= label f, :release_time %>
+  <%= time_input f, :release_time %>
+  <%= error_tag f, :release_time %>
 
   <div>
     <%= submit "Save", phx_disable_with: "Saving..." %>
