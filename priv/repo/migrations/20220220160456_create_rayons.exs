@@ -5,8 +5,9 @@ defmodule Dovecot.Repo.Migrations.CreateRayons do
     create table(:rayons, primary_key: false) do
       add :id, :binary_id, primary_key: true
 
-      add :loft_id, references(:lofts, column: :loft_id, on_delete: :nothing, type: :binary_id),
-        null: false
+      add :loft_id,
+          references(:lofts, column: :loft_id, on_delete: :delete_all, type: :binary_id),
+          null: false
 
       add :name, :string, null: false
 

@@ -23,4 +23,13 @@ defmodule Dovecot.Factory do
   end
 
   def rayon_factory, do: %Dovecot.Rayons.Rayon{name: sequence(:rayon_name, &"some name#{&1}")}
+
+  def race_factory do
+    %Dovecot.Races.Race{
+      name: "some name",
+      distance: 745,
+      release_date: ~D[2000-02-28],
+      release_time: ~T[07:30:00]
+    }
+  end
 end

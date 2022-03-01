@@ -100,6 +100,9 @@ defmodule DovecotWeb.Router do
 
       live "/pigeons/:id", PigeonLive.Show, :show
       live "/pigeons/:id/show/edit", PigeonLive.Show, :edit
+
+      live "/races/new", RaceLive.Form, :new
+      live "/races/:date/:name", RaceLive.Form, :edit
     end
   end
 end
