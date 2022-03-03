@@ -40,6 +40,10 @@ defmodule Dovecot.Races do
   def get_race_by_release_date_and_name!(release_date, name),
     do: Repo.get_by!(Race, release_date: release_date, name: name)
 
+  def get_race_with_matching_name(name) do
+    Repo.all(from r in Race, where: ilike(r.name, ^"%#{name}%"))
+  end
+
   @doc """
   Creates a race.
 

@@ -3,6 +3,7 @@ defmodule DovecotWeb.RaceLive.Form do
 
   alias Dovecot.Races
   alias Dovecot.Races.Race
+  alias Ecto.Changeset
 
   @impl true
   def mount(_params, _session, socket) do
@@ -21,29 +22,72 @@ defmodule DovecotWeb.RaceLive.Form do
     |> assign(:title, "Edit Race")
     |> assign(:race, race)
     |> assign(:changeset, Races.change_race(race))
+    |> assign(:suggestions, [])
   end
 
   defp apply_action(socket, :new, _params) do
-    race = %Race{}
+    race = %Race{loft_id: Dovecot.Repo.get_loft_id()}
 
     socket
     |> assign(:title, "New Race")
     |> assign(:race, race)
     |> assign(:changeset, Races.change_race(race))
+    |> assign(:suggestions, [])
   end
 
   @impl true
-  def handle_event("validate", %{"race" => race_params}, socket) do
-    changeset =
-      socket.assigns.race
-      |> Races.change_race(Map.put(race_params, "loft_id", Dovecot.Repo.get_loft_id()))
-      |> Map.put(:action, :validate)
+  def handle_event("validate", %{"race" => race_params} = params, socket) do
+    socket =
+      socket
+      |> validate_params(race_params)
+      |> update_suggestions(params)
 
-    {:noreply, assign(socket, :changeset, changeset)}
+    {:noreply, socket}
   end
 
+  @impl true
   def handle_event("save", %{"race" => race_params}, socket) do
     save_race(socket, socket.assigns.live_action, race_params)
+  end
+
+  @impl true
+  def handle_event("apply_suggestion", %{"race_id" => race_id}, socket) do
+    suggestion = Enum.find(socket.assigns[:suggestions], fn s -> s.id == race_id end)
+
+    new_changeset =
+      Changeset.change(socket.assigns[:changeset],
+        name: suggestion.name,
+        distance: suggestion.distance
+      )
+
+    socket =
+      socket
+      |> assign(:suggestions, [])
+      |> assign(:changeset, new_changeset)
+      |> validate_params(new_changeset.changes)
+
+    {:noreply, socket}
+  end
+
+  defp validate_params(socket, race_params) do
+    changeset =
+      socket.assigns.race
+      |> Races.change_race(race_params)
+      |> Map.put(:action, :validate)
+
+    assign(socket, :changeset, changeset)
+  end
+
+  defp update_suggestions(
+         %{assigns: %{live_action: :new}} = socket,
+         %{"_target" => ["race", "name"] = path} = params
+       ) do
+    suggestions = Races.get_race_with_matching_name(get_in(params, path))
+    assign(socket, :suggestions, suggestions)
+  end
+
+  defp update_suggestions(socket, _params) do
+    socket
   end
 
   defp save_race(socket, :edit, race_params) do
@@ -56,7 +100,7 @@ defmodule DovecotWeb.RaceLive.Form do
            to: Routes.race_form_path(socket, :edit, Date.to_iso8601(race.release_date), race.name)
          )}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
+      {:error, %Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
     end
   end
@@ -71,7 +115,7 @@ defmodule DovecotWeb.RaceLive.Form do
            to: Routes.race_form_path(socket, :edit, Date.to_iso8601(race.release_date), race.name)
          )}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
+      {:error, %Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
     end
   end

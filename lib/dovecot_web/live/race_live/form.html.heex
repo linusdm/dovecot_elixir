@@ -9,6 +9,11 @@
 
   <%= label f, :name %>
   <%= text_input f, :name %>
+  <%= for suggestion <- @suggestions do %>
+    <div phx-click="apply_suggestion" phx-value-race_id={suggestion.id}>
+      <%= suggestion.name %> - <%= suggestion.distance %>m - <%= Calendar.strftime(suggestion.release_date, "%d/%m/%Y") %>
+    </div>
+  <% end %>
   <%= error_tag f, :name %>
 
   <%= label f, :distance %>
