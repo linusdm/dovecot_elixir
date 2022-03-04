@@ -1,6 +1,7 @@
 defmodule Dovecot.RacesTest do
   use Dovecot.DataCase
 
+  alias Ecto.Changeset
   alias Dovecot.Races
 
   describe "races" do
@@ -28,7 +29,6 @@ defmodule Dovecot.RacesTest do
 
     test "create_race/1 with valid data creates a race", %{loft: loft} do
       valid_attrs = %{
-        loft_id: loft.loft_id,
         distance: 50_000,
         name: "some name",
         release_date: ~D[2022-02-28],
@@ -36,6 +36,7 @@ defmodule Dovecot.RacesTest do
       }
 
       assert {:ok, %Race{} = race} = Races.create_race(valid_attrs)
+      assert race.loft_id == loft.loft_id
       assert race.distance == 50_000
       assert race.name == "some name"
       assert race.release_date == ~D[2022-02-28]
@@ -43,7 +44,7 @@ defmodule Dovecot.RacesTest do
     end
 
     test "create_race/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Races.create_race(@invalid_attrs)
+      assert {:error, %Changeset{}} = Races.create_race(@invalid_attrs)
     end
 
     test "update_race/2 with valid data updates the race", %{loft: loft} do
@@ -65,7 +66,7 @@ defmodule Dovecot.RacesTest do
 
     test "update_race/2 with invalid data returns error changeset", %{loft: loft} do
       race = insert(:race, %{loft_id: loft.loft_id})
-      assert {:error, %Ecto.Changeset{}} = Races.update_race(race, @invalid_attrs)
+      assert {:error, %Changeset{}} = Races.update_race(race, @invalid_attrs)
       assert race == Races.get_race!(race.id)
     end
 
@@ -75,9 +76,30 @@ defmodule Dovecot.RacesTest do
       assert_raise Ecto.NoResultsError, fn -> Races.get_race!(race.id) end
     end
 
-    test "change_race/1 returns a race changeset", %{loft: loft} do
-      race = insert(:race, %{loft_id: loft.loft_id})
-      assert %Ecto.Changeset{} = Races.change_race(race)
+    test "change_race/1 returns a race changeset" do
+      race = build(:race)
+      assert %Changeset{} = Races.change_race(race)
+    end
+
+    test "apply_suggestion/2" do
+      race = build(:race, name: "original", distance: 1000, release_date: ~D[2000-01-01])
+
+      changeset =
+        Race.changeset(race, %{
+          "name" => "new",
+          "distance" => "2000",
+          "release_date" => "2000-01-02"
+        })
+
+      suggestion = build(:race, name: "suggested", distance: 3000, release_date: "2000-01-03")
+
+      applied_changeset = Races.apply_race_suggestion(changeset, suggestion)
+
+      assert Changeset.fetch_change!(applied_changeset, :name) == suggestion.name
+      assert Changeset.fetch_change!(applied_changeset, :distance) == suggestion.distance
+
+      assert Changeset.fetch_change!(applied_changeset, :release_date) ==
+               Changeset.fetch_change!(changeset, :release_date)
     end
   end
 end
