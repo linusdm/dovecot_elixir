@@ -22,7 +22,6 @@ defmodule DovecotWeb.RaceLive.Form do
     |> assign(:title, "Edit Race")
     |> assign(:race, race)
     |> assign(:changeset, Races.change_race(race))
-    |> assign(:suggestions, [])
   end
 
   defp apply_action(socket, :new, _params) do
@@ -32,7 +31,6 @@ defmodule DovecotWeb.RaceLive.Form do
     |> assign(:title, "New Race")
     |> assign(:race, race)
     |> assign(:changeset, Races.change_race(race))
-    |> assign(:suggestions, [])
   end
 
   @impl true
@@ -61,7 +59,7 @@ defmodule DovecotWeb.RaceLive.Form do
 
     socket =
       socket
-      |> assign(:suggestions, [])
+      |> assign(:suggestions, nil)
       |> assign(:changeset, changeset)
 
     {:noreply, socket}
