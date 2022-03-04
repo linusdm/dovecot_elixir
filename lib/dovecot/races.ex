@@ -57,7 +57,7 @@ defmodule Dovecot.Races do
 
   """
   def create_race(attrs \\ %{}) do
-    %Race{}
+    %Race{loft_id: Dovecot.Repo.get_loft_id()}
     |> Race.changeset(attrs)
     |> Repo.insert()
   end
@@ -107,5 +107,14 @@ defmodule Dovecot.Races do
   """
   def change_race(%Race{} = race, attrs \\ %{}) do
     Race.changeset(race, attrs)
+  end
+
+  def apply_race_suggestion(%{data: %Race{} = race, params: attrs}, %Race{} = suggestion) do
+    merged_attrs =
+      attrs
+      |> Map.put("name", suggestion.name)
+      |> Map.put("distance", suggestion.distance)
+
+    Race.changeset(race, merged_attrs)
   end
 end

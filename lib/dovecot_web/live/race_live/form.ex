@@ -26,7 +26,7 @@ defmodule DovecotWeb.RaceLive.Form do
   end
 
   defp apply_action(socket, :new, _params) do
-    race = %Race{loft_id: Dovecot.Repo.get_loft_id()}
+    race = %Race{}
 
     socket
     |> assign(:title, "New Race")
@@ -54,17 +54,15 @@ defmodule DovecotWeb.RaceLive.Form do
   def handle_event("apply_suggestion", %{"race_id" => race_id}, socket) do
     suggestion = Enum.find(socket.assigns[:suggestions], fn s -> s.id == race_id end)
 
-    new_changeset =
-      Changeset.change(socket.assigns[:changeset],
-        name: suggestion.name,
-        distance: suggestion.distance
-      )
+    changeset =
+      socket.assigns.changeset
+      |> Races.apply_race_suggestion(suggestion)
+      |> Map.put(:action, :validate)
 
     socket =
       socket
       |> assign(:suggestions, [])
-      |> assign(:changeset, new_changeset)
-      |> validate_params(new_changeset.changes)
+      |> assign(:changeset, changeset)
 
     {:noreply, socket}
   end
@@ -80,9 +78,9 @@ defmodule DovecotWeb.RaceLive.Form do
 
   defp update_suggestions(
          %{assigns: %{live_action: :new}} = socket,
-         %{"_target" => ["race", "name"] = path} = params
+         %{"_target" => ["race", "name"] = keys} = params
        ) do
-    suggestions = Races.get_race_with_matching_name(get_in(params, path))
+    suggestions = Races.get_race_with_matching_name(get_in(params, keys))
     assign(socket, :suggestions, suggestions)
   end
 
@@ -106,7 +104,7 @@ defmodule DovecotWeb.RaceLive.Form do
   end
 
   defp save_race(socket, :new, race_params) do
-    case Races.create_race(Map.put(race_params, "loft_id", Dovecot.Repo.get_loft_id())) do
+    case Races.create_race(race_params) do
       {:ok, race} ->
         {:noreply,
          socket

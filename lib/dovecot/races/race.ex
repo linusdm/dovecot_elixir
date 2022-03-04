@@ -17,8 +17,8 @@ defmodule Dovecot.Races.Race do
   @doc false
   def changeset(race, attrs) do
     race
-    |> cast(attrs, [:loft_id, :name, :distance, :release_date, :release_time])
-    |> validate_required([:loft_id, :name, :release_date])
+    |> cast(attrs, [:name, :distance, :release_date, :release_time])
+    |> validate_required([:name, :release_date])
     |> validate_number(:distance, greater_than_or_equal_to: 1000, less_than_or_equal_to: 5_000_000)
     |> unsafe_validate_unique([:loft_id, :name, :release_date], Dovecot.Repo,
       error_key: :name,

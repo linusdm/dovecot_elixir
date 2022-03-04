@@ -29,14 +29,14 @@ defmodule Dovecot.RacesTest do
     test "create_race/1 with valid data creates a race", %{loft: loft} do
       valid_attrs = %{
         loft_id: loft.loft_id,
-        distance: 42,
+        distance: 50_000,
         name: "some name",
         release_date: ~D[2022-02-28],
         release_time: ~T[14:00:00]
       }
 
       assert {:ok, %Race{} = race} = Races.create_race(valid_attrs)
-      assert race.distance == 42
+      assert race.distance == 50_000
       assert race.name == "some name"
       assert race.release_date == ~D[2022-02-28]
       assert race.release_time == ~T[14:00:00]
@@ -50,14 +50,14 @@ defmodule Dovecot.RacesTest do
       race = insert(:race, %{loft_id: loft.loft_id})
 
       update_attrs = %{
-        distance: 43,
+        distance: 50_000,
         name: "some updated name",
         release_date: ~D[2022-03-01],
         release_time: ~T[15:01:01]
       }
 
       assert {:ok, %Race{} = race} = Races.update_race(race, update_attrs)
-      assert race.distance == 43
+      assert race.distance == 50_000
       assert race.name == "some updated name"
       assert race.release_date == ~D[2022-03-01]
       assert race.release_time == ~T[15:01:01]
