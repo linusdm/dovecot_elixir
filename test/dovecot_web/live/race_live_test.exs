@@ -62,8 +62,10 @@ defmodule DovecotWeb.RaceLiveTest do
 
     result =
       form_live
-      |> element("div", "suggested - 3000m - 03/01/2000")
+      |> element("div", "suggested")
       |> render_click()
+
+    refute has_element?(element(form_live, "div", "suggested"))
 
     assert result =~ suggestion.name
     assert result =~ "#{suggestion.distance}"
