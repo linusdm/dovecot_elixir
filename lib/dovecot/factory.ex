@@ -33,8 +33,8 @@ defmodule Dovecot.Factory do
     }
   end
 
-  def race_participation_factory do
-    %Dovecot.Races.RaceParticipation{
+  def participation_factory do
+    %Dovecot.Races.Participation{
       constatation: ~N[2022-03-04 15:25:00]
     }
   end

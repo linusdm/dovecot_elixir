@@ -1,8 +1,8 @@
-defmodule Dovecot.Repo.Migrations.CreateRaceParticipations do
+defmodule Dovecot.Repo.Migrations.CreateParticipations do
   use Ecto.Migration
 
   def change do
-    create table(:race_participations, primary_key: false) do
+    create table(:races_participations, primary_key: false) do
       add :loft_id,
           references(:lofts, column: :loft_id, on_delete: :delete_all, type: :binary_id),
           primary_key: true
@@ -30,8 +30,8 @@ defmodule Dovecot.Repo.Migrations.CreateRaceParticipations do
       timestamps()
     end
 
-    create index(:race_participations, [:loft_id])
-    create index(:race_participations, [:race_id])
-    create index(:race_participations, [:pigeon_id])
+    create index(:races_participations, [:loft_id])
+    create index(:races_participations, [:race_id])
+    create index(:races_participations, [:pigeon_id])
   end
 end

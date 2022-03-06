@@ -1,9 +1,9 @@
-defmodule Dovecot.Races.RaceParticipation do
+defmodule Dovecot.Races.Participation do
   use Ecto.Schema
   import Ecto.Changeset
 
   @primary_key false
-  schema "race_participations" do
+  schema "races_participations" do
     field :constatation, :naive_datetime
 
     belongs_to :loft, Dovecot.Lofts.Loft,
@@ -18,8 +18,8 @@ defmodule Dovecot.Races.RaceParticipation do
   end
 
   @doc false
-  def changeset(race_participation, attrs) do
-    race_participation
+  def changeset(participation, attrs) do
+    participation
     |> cast(attrs, [:pigeon_id, :race_id, :constatation])
     |> validate_required([:pigeon_id, :race_id, :constatation])
   end
