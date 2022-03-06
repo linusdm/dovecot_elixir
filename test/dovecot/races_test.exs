@@ -1,21 +1,21 @@
 defmodule Dovecot.RacesTest do
   use Dovecot.DataCase
 
+  import Dovecot.Factory
+
   alias Ecto.Changeset
   alias Dovecot.Races
+
+  setup do
+    loft = insert(:loft)
+    Dovecot.Repo.put_loft_id(loft.loft_id)
+    %{loft: loft}
+  end
 
   describe "races" do
     alias Dovecot.Races.Race
 
-    import Dovecot.Factory
-
     @invalid_attrs %{distance: nil, name: nil, release_date: nil, release_time: nil}
-
-    setup do
-      loft = insert(:loft)
-      Dovecot.Repo.put_loft_id(loft.loft_id)
-      %{loft: loft}
-    end
 
     test "list_races/0 returns all races", %{loft: loft} do
       race = insert(:race, %{loft_id: loft.loft_id})

@@ -18,6 +18,7 @@ defmodule Dovecot.Repo.Migrations.CreateRaces do
     end
 
     create unique_index(:races, [:loft_id, :name, :release_date])
+    create unique_index(:races, [:loft_id, :id])
     create index(:races, [:loft_id])
   end
 end

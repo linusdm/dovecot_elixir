@@ -16,6 +16,7 @@ defmodule Dovecot.Repo.Migrations.CreatePigeons do
     end
 
     create unique_index(:pigeons, [:loft_id, :ring])
+    create unique_index(:pigeons, [:loft_id, :id])
     create index(:pigeons, [:loft_id])
   end
 end

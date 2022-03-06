@@ -26,10 +26,16 @@ defmodule Dovecot.Factory do
 
   def race_factory do
     %Dovecot.Races.Race{
-      name: "some name",
-      distance: 745,
+      name: sequence(:race_name, &"some name #{&1}"),
+      distance: 100_000,
       release_date: ~D[2000-02-28],
       release_time: ~T[07:30:00]
+    }
+  end
+
+  def race_participation_factory do
+    %Dovecot.Races.RaceParticipation{
+      constatation: ~N[2022-03-04 15:25:00]
     }
   end
 end

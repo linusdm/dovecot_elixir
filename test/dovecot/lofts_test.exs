@@ -6,17 +6,17 @@ defmodule Dovecot.LoftsTest do
   describe "lofts" do
     alias Dovecot.Lofts.Loft
 
-    import Dovecot.LoftsFixtures
+    import Dovecot.Factory
 
     @invalid_attrs %{name: nil}
 
     test "list_lofts/0 returns all lofts" do
-      loft = loft_fixture()
+      loft = insert(:loft)
       assert Lofts.list_lofts() == [loft]
     end
 
     test "get_loft!/1 returns the loft with given loft_id" do
-      loft = loft_fixture()
+      loft = insert(:loft)
       assert Lofts.get_loft!(loft.loft_id) == loft
     end
 
@@ -32,7 +32,7 @@ defmodule Dovecot.LoftsTest do
     end
 
     test "update_loft/2 with valid data updates the loft" do
-      loft = loft_fixture()
+      loft = insert(:loft)
       update_attrs = %{name: "some updated name"}
 
       assert {:ok, %Loft{} = loft} = Lofts.update_loft(loft, update_attrs)
@@ -40,19 +40,19 @@ defmodule Dovecot.LoftsTest do
     end
 
     test "update_loft/2 with invalid data returns error changeset" do
-      loft = loft_fixture()
+      loft = insert(:loft)
       assert {:error, %Ecto.Changeset{}} = Lofts.update_loft(loft, @invalid_attrs)
       assert loft == Lofts.get_loft!(loft.loft_id)
     end
 
     test "delete_loft/1 deletes the loft" do
-      loft = loft_fixture()
+      loft = insert(:loft)
       assert {:ok, %Loft{}} = Lofts.delete_loft(loft)
       assert_raise Ecto.NoResultsError, fn -> Lofts.get_loft!(loft.loft_id) end
     end
 
     test "change_loft/1 returns a loft changeset" do
-      loft = loft_fixture()
+      loft = insert(:loft)
       assert %Ecto.Changeset{} = Lofts.change_loft(loft)
     end
   end
