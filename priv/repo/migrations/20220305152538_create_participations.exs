@@ -3,9 +3,7 @@ defmodule Dovecot.Repo.Migrations.CreateParticipations do
 
   def change do
     create table(:races_participations, primary_key: false) do
-      add :loft_id,
-          references(:lofts, column: :loft_id, on_delete: :delete_all, type: :binary_id),
-          primary_key: true
+      add :loft_id, :binary_id, primary_key: true
 
       add :race_id,
           references(:races,

@@ -21,6 +21,6 @@ defmodule Dovecot.Races.Participation do
   def changeset(participation, attrs) do
     participation
     |> cast(attrs, [:pigeon_id, :race_id, :constatation])
-    |> validate_required([:pigeon_id, :race_id, :constatation])
+    |> validate_required([:pigeon_id, :race_id])
   end
 end
