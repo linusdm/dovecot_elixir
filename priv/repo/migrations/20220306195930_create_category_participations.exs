@@ -17,10 +17,12 @@ defmodule Dovecot.Repo.Migrations.CreateCategoryParticipations do
           primary_key: true
 
       add :category, :string, primary_key: true
+      add :rank, :integer, null: false
 
       timestamps()
     end
 
+    create unique_index(:races_category_participations, [:loft_id, :race_id, :category, :rank])
     create index(:races_category_participations, [:loft_id])
     create index(:races_category_participations, [:race_id])
     create index(:races_category_participations, [:pigeon_id])

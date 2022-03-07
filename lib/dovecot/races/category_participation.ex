@@ -8,6 +8,7 @@ defmodule Dovecot.Races.CategoryParticipation do
     field :race_id, :binary_id, primary_key: true
     field :pigeon_id, :binary_id, primary_key: true
     field :category, Ecto.Enum, values: [:jong, :jaarling, :oud], primary_key: true
+    field :rank, :integer
 
     timestamps()
   end
@@ -15,7 +16,7 @@ defmodule Dovecot.Races.CategoryParticipation do
   @doc false
   def changeset(category_participation, attrs) do
     category_participation
-    |> cast(attrs, [:pigeon_id, :race_id, :category])
-    |> validate_required([:pigeon_id, :race_id, :category])
+    |> cast(attrs, [:pigeon_id, :race_id, :category, :rank])
+    |> validate_required([:pigeon_id, :race_id, :category, :rank])
   end
 end
