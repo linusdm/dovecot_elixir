@@ -34,8 +34,13 @@ defmodule Dovecot.Factory do
   end
 
   def participation_factory do
-    %Dovecot.Races.Participation{
-      constatation: ~N[2022-03-04 15:25:00]
+    %Dovecot.Races.Participation{}
+  end
+
+  def category_participation_factory do
+    %Dovecot.Races.CategoryParticipation{
+      category: :oud,
+      rank: 1
     }
   end
 end

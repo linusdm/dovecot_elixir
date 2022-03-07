@@ -13,7 +13,20 @@
 import Dovecot.Factory
 
 loft = insert(:loft, %{name: "test loft"})
-
-insert_list(10, :pigeon, %{loft_id: loft.loft_id})
-
 insert(:user, %{email: "some@email.com", password: "hello Dovecot!", loft_id: loft.loft_id})
+
+pigeons = insert_list(10, :pigeon, %{loft_id: loft.loft_id})
+
+race = insert(:race, %{loft_id: loft.loft_id})
+
+for {pigeon, rank} <- Enum.with_index(pigeons, 1) do
+  insert(:participation, %{loft: loft, race: race, pigeon: pigeon})
+
+  insert(:category_participation, %{
+    loft: loft,
+    race: race,
+    pigeon: pigeon,
+    category: :jong,
+    rank: rank
+  })
+end

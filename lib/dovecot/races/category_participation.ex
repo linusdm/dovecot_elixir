@@ -4,9 +4,14 @@ defmodule Dovecot.Races.CategoryParticipation do
 
   @primary_key false
   schema "races_category_participations" do
-    field :loft_id, :binary_id, primary_key: true
-    field :race_id, :binary_id, primary_key: true
-    field :pigeon_id, :binary_id, primary_key: true
+    belongs_to :loft, Dovecot.Lofts.Loft,
+      references: :loft_id,
+      type: :binary_id,
+      primary_key: true
+
+    belongs_to :race, Dovecot.Races.Race, type: :binary_id, primary_key: true
+    belongs_to :pigeon, Dovecot.Pigeons.Pigeon, type: :binary_id, primary_key: true
+
     field :category, Ecto.Enum, values: [:jong, :jaarling, :oud], primary_key: true
     field :rank, :integer
 

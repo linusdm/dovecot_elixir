@@ -4,8 +4,6 @@ defmodule Dovecot.Races.Participation do
 
   @primary_key false
   schema "races_participations" do
-    field :constatation, :naive_datetime
-
     belongs_to :loft, Dovecot.Lofts.Loft,
       references: :loft_id,
       type: :binary_id,
@@ -13,6 +11,8 @@ defmodule Dovecot.Races.Participation do
 
     belongs_to :race, Dovecot.Races.Race, type: :binary_id, primary_key: true
     belongs_to :pigeon, Dovecot.Pigeons.Pigeon, type: :binary_id, primary_key: true
+
+    field :constatation, :naive_datetime
 
     timestamps()
   end
