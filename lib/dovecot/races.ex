@@ -6,7 +6,7 @@ defmodule Dovecot.Races do
   import Ecto.Query, warn: false
   alias Dovecot.Repo
 
-  alias Dovecot.Races.Race
+  alias Dovecot.Races.{Race, Participation, CategoryParticipation}
 
   @doc """
   Returns the list of races.
@@ -124,5 +124,26 @@ defmodule Dovecot.Races do
       |> Map.put("distance", suggestion.distance)
 
     Race.changeset(race, merged_attrs)
+  end
+
+  def get_blah(%Race{id: race_id}, category) do
+    query =
+      from p in Participation,
+        join: cp in CategoryParticipation,
+        on: [loft_id: p.loft_id, race_id: p.race_id, pigeon_id: p.pigeon_id],
+        join: pi in assoc(p, :pigeon),
+        where: cp.race_id == ^race_id,
+        where: cp.category == ^category,
+        order_by: cp.rank,
+        select: %{
+          category: cp.category,
+          pigeon_id: pi.id,
+          ring: pi.ring,
+          name: pi.name,
+          rank: cp.rank,
+          constatation: p.constatation
+        }
+
+    Repo.all(query)
   end
 end

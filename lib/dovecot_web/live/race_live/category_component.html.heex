@@ -1,0 +1,38 @@
+<div>
+  <.form let={f} for={@changeset} as="constatations" phx-submit="save" phx-target={@myself}>
+    <table>
+      <thead>
+        <tr>
+          <th>rank</th>
+          <th>ring</th>
+          <th>name</th>
+          <th>constatation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= for {row, fp} <- with_form(@rows, inputs_for(f, :values)) do %>
+          <tr>
+            <td><%= row.rank %></td>
+            <td><%= row.ring %></td>
+            <td><%= row.name %></td>
+            <td>
+              <%= hidden_inputs_for(fp) %>
+              <%= datetime_local_input fp, :constatation %>
+              <%= error_tag_for_embedded fp, :constatation %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>
+            <%= submit "Save", phx_disable_with: "Saving..." %>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </.form>
+</div>

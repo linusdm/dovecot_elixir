@@ -23,6 +23,14 @@ defmodule Dovecot.Repo.Migrations.CreateCategoryParticipations do
     end
 
     create unique_index(:races_category_participations, [:loft_id, :race_id, :category, :rank])
+
+    create unique_index(:races_category_participations, [
+             :loft_id,
+             :race_id,
+             :pigeon_id,
+             :category
+           ])
+
     create index(:races_category_participations, [:loft_id])
     create index(:races_category_participations, [:race_id])
     create index(:races_category_participations, [:pigeon_id])

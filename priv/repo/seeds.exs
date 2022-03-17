@@ -19,14 +19,16 @@ pigeons = insert_list(10, :pigeon, %{loft_id: loft.loft_id})
 
 race = insert(:race, %{loft_id: loft.loft_id})
 
-for {pigeon, rank} <- Enum.with_index(pigeons, 1) do
+for pigeon <- pigeons do
   insert(:participation, %{loft: loft, race: race, pigeon: pigeon})
+end
 
+for {pigeon, rank} <- Enum.with_index(pigeons, 1), category <- [:jong, :jaarling, :oud] do
   insert(:category_participation, %{
     loft: loft,
     race: race,
     pigeon: pigeon,
-    category: :jong,
+    category: category,
     rank: rank
   })
 end
