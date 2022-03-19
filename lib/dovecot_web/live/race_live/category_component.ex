@@ -14,6 +14,7 @@ defmodule DovecotWeb.RaceLive.CategoryComponent do
      socket
      |> assign(:race, assigns.race)
      |> assign(:category, assigns.category)
+     |> assign(:path, assigns.path)
      |> init_assigns()}
   end
 
@@ -21,17 +22,7 @@ defmodule DovecotWeb.RaceLive.CategoryComponent do
   def handle_event("save", %{"constatations" => constatations_params}, socket) do
     case Races.bulk_update_constatations(socket.assigns.changeset.data, constatations_params) do
       :ok ->
-        {:noreply,
-         socket
-         |> push_redirect(
-           to:
-             Routes.live_path(
-               socket,
-               DovecotWeb.RaceLive.Details,
-               Date.to_iso8601(socket.assigns.race.release_date),
-               socket.assigns.race.name
-             )
-         )}
+        {:noreply, push_redirect(socket, to: socket.assigns.path)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
