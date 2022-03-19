@@ -144,21 +144,10 @@ defmodule Dovecot.Races do
   end
 
   alias Dovecot.Races.BulkUpdateConstatations
-  alias Dovecot.Races.BulkUpdateConstatations.Constatation
-  alias Dovecot.Races.RelativeDateTime, as: RelDateTime
+  alias Dovecot.Races.RelativeDateTime
 
   def change_constatations(%Date{} = start_date, participations, attrs \\ %{}) do
-    %BulkUpdateConstatations{
-      values:
-        Enum.map(participations, fn %Participation{} = participation ->
-          %Constatation{
-            pigeon_id: participation.pigeon_id,
-            participation: participation,
-            start_date: start_date,
-            relative_datetime: RelDateTime.create(start_date, participation.constatation)
-          }
-        end)
-    }
+    BulkUpdateConstatations.create(start_date, participations)
     |> BulkUpdateConstatations.changeset(attrs)
   end
 
@@ -172,10 +161,12 @@ defmodule Dovecot.Races do
                            participation: %Participation{} = participation,
                            start_date: %Date{} = start_date
                          },
-                         changes: %{relative_datetime: %RelDateTime{} = relative}
+                         changes: %{relative_datetime: %RelativeDateTime{} = relative}
                        } ->
+          constatation = RelativeDateTime.get_datetime(start_date, relative)
+
           participation
-          |> Ecto.Changeset.change(constatation: RelDateTime.get_datetime(start_date, relative))
+          |> Ecto.Changeset.change(constatation: constatation)
           |> Repo.update!()
         end)
 
