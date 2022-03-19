@@ -4,7 +4,9 @@ defmodule Dovecot.Races do
   """
 
   import Ecto.Query, warn: false
+  alias Ecto.Multi
   alias Dovecot.Repo
+  alias Dovecot.Races.BulkUpdateConstatations
 
   alias Dovecot.Races.{Race, Participation, CategoryParticipation}
 
@@ -143,9 +145,6 @@ defmodule Dovecot.Races do
     |> Repo.all()
   end
 
-  alias Dovecot.Races.BulkUpdateConstatations
-  alias Dovecot.Races.RelativeDateTime
-
   def change_constatations(%Date{} = start_date, participations, attrs \\ %{}) do
     BulkUpdateConstatations.create(start_date, participations)
     |> BulkUpdateConstatations.changeset(attrs)
@@ -153,22 +152,13 @@ defmodule Dovecot.Races do
 
   def bulk_update_constatations(%BulkUpdateConstatations{} = bulk_update, attrs) do
     case BulkUpdateConstatations.changeset(bulk_update, attrs) do
-      %Ecto.Changeset{valid?: true, changes: %{values: values}} ->
-        values
-        |> Enum.filter(&match?(%{changes: %{relative_datetime: _}}, &1))
-        |> Enum.map(fn %{
-                         data: %{
-                           participation: %Participation{} = participation,
-                           start_date: %Date{} = start_date
-                         },
-                         changes: %{relative_datetime: %RelativeDateTime{} = relative}
-                       } ->
-          constatation = RelativeDateTime.get_datetime(start_date, relative)
-
-          participation
-          |> Ecto.Changeset.change(constatation: constatation)
-          |> Repo.update!()
+      %Ecto.Changeset{valid?: true, changes: %{values: _constatation_changesets}} = changeset ->
+        BulkUpdateConstatations.to_participation_changesets(changeset)
+        |> Enum.with_index()
+        |> Enum.reduce(Multi.new(), fn {changeset, index}, multi ->
+          Multi.update(multi, {:constatation, index}, changeset)
         end)
+        |> Repo.transaction()
 
         :ok
 

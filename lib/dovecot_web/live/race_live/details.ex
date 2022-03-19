@@ -9,7 +9,7 @@ defmodule DovecotWeb.RaceLive.Details do
   end
 
   @impl true
-  def handle_params(%{"date" => date, "name" => name} = _params, _url, socket) do
+  def handle_params(%{"date" => date, "name" => name}, _url, socket) do
     race = Races.get_race_by_release_date_and_name!(date, name)
     {:noreply, assign(socket, :race, race)}
   end

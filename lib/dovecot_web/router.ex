@@ -104,7 +104,7 @@ defmodule DovecotWeb.Router do
       live "/races/new", RaceLive.Form, :new
       live "/races/:date/:name", RaceLive.Form, :edit
 
-      live "/races/:date/:name/detail", RaceLive.Details
+      live "/races/:date/:name/details", RaceLive.Details
     end
   end
 end
