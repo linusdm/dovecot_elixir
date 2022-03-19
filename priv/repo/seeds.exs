@@ -15,7 +15,7 @@ import Dovecot.Factory
 loft = insert(:loft, %{name: "test loft"})
 insert(:user, %{email: "some@email.com", password: "hello Dovecot!", loft_id: loft.loft_id})
 
-pigeons = insert_list(10, :pigeon, %{loft_id: loft.loft_id})
+pigeons = insert_list(5, :pigeon, %{loft_id: loft.loft_id})
 
 race = insert(:race, %{loft_id: loft.loft_id})
 

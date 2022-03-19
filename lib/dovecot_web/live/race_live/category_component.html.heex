@@ -12,13 +12,13 @@
       <tbody>
         <%= for {row, fp} <- with_form(@rows, inputs_for(f, :values)) do %>
           <tr>
-            <td><%= row.rank %></td>
-            <td><%= row.ring %></td>
-            <td><%= row.name %></td>
+            <td><%= row.category_participation.rank %></td>
+            <td><%= row.pigeon.ring %></td>
+            <td><%= row.pigeon.name %></td>
             <td>
               <%= hidden_inputs_for(fp) %>
-              <%= datetime_local_input fp, :constatation %>
-              <%= error_tag_for_embedded fp, :constatation %>
+              <%= text_input fp, :relative_datetime, placeholder: "d hh:mm:ss" %>
+              <%= error_tag_for_embedded fp, :relative_datetime %>
             </td>
           </tr>
         <% end %>

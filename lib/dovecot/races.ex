@@ -126,24 +126,66 @@ defmodule Dovecot.Races do
     Race.changeset(race, merged_attrs)
   end
 
-  def get_blah(%Race{id: race_id}, category) do
-    query =
-      from p in Participation,
-        join: cp in CategoryParticipation,
-        on: [loft_id: p.loft_id, race_id: p.race_id, pigeon_id: p.pigeon_id],
-        join: pi in assoc(p, :pigeon),
-        where: cp.race_id == ^race_id,
-        where: cp.category == ^category,
-        order_by: cp.rank,
-        select: %{
-          category: cp.category,
-          pigeon_id: pi.id,
-          ring: pi.ring,
-          name: pi.name,
-          rank: cp.rank,
-          constatation: p.constatation
-        }
+  def get_category_participations(%Race{id: race_id}, category) do
+    from(p in Participation,
+      join: cp in CategoryParticipation,
+      on: [loft_id: p.loft_id, race_id: p.race_id, pigeon_id: p.pigeon_id],
+      join: pi in assoc(p, :pigeon),
+      where: cp.race_id == ^race_id,
+      where: cp.category == ^category,
+      order_by: cp.rank,
+      select: %{
+        participation: p,
+        category_participation: cp,
+        pigeon: pi
+      }
+    )
+    |> Repo.all()
+  end
 
-    Repo.all(query)
+  alias Dovecot.Races.BulkUpdateConstatations
+  alias Dovecot.Races.BulkUpdateConstatations.Constatation
+  alias Dovecot.Races.RelativeDateTime, as: RelDateTime
+
+  def change_constatations(%Date{} = start_date, participations, attrs \\ %{}) do
+    %BulkUpdateConstatations{
+      values:
+        Enum.map(participations, fn %Participation{} = participation ->
+          %Constatation{
+            pigeon_id: participation.pigeon_id,
+            participation: participation,
+            start_date: start_date,
+            relative_datetime: RelDateTime.create(start_date, participation.constatation)
+          }
+        end)
+    }
+    |> BulkUpdateConstatations.changeset(attrs)
+  end
+
+  def bulk_update_constatations(%BulkUpdateConstatations{} = bulk_update, attrs) do
+    case BulkUpdateConstatations.changeset(bulk_update, attrs) do
+      %Ecto.Changeset{valid?: true, changes: %{values: values}} ->
+        values
+        |> Enum.filter(&match?(%{changes: %{relative_datetime: _}}, &1))
+        |> Enum.map(fn %{
+                         data: %{
+                           participation: %Participation{} = participation,
+                           start_date: %Date{} = start_date
+                         },
+                         changes: %{relative_datetime: %RelDateTime{} = relative}
+                       } ->
+          participation
+          |> Ecto.Changeset.change(constatation: RelDateTime.get_datetime(start_date, relative))
+          |> Repo.update!()
+        end)
+
+        :ok
+
+      %Ecto.Changeset{valid?: true} ->
+        :ok
+
+      changeset ->
+        {:error, changeset}
+    end
   end
 end

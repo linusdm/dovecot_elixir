@@ -2,8 +2,6 @@ defmodule DovecotWeb.RaceLive.CategoryComponent do
   use DovecotWeb, :live_component
 
   alias Dovecot.Races
-  alias Dovecot.Races.EmbeddedConstatations
-  alias Dovecot.Races.EmbeddedConstatations.Constatation
 
   @impl true
   def mount(socket) do
@@ -12,35 +10,32 @@ defmodule DovecotWeb.RaceLive.CategoryComponent do
 
   @impl true
   def update(assigns, socket) do
-    rows = Races.get_blah(assigns.race, assigns.category)
-
-    constatations = %EmbeddedConstatations{
-      values:
-        Enum.map(rows, fn row ->
-          %Constatation{pigeon_id: row.pigeon_id, constatation: row.constatation}
-        end)
-    }
-
-    changeset = EmbeddedConstatations.changeset(constatations, %{})
-
     {:ok,
      socket
-     |> assign(:rows, rows)
-     |> assign(:constatations, constatations)
-     |> assign(:changeset, changeset)}
+     |> assign(:race, assigns.race)
+     |> assign(:category, assigns.category)
+     |> init_assigns()}
   end
 
   @impl true
-  def handle_event("save", params, socket) do
-    changeset =
-      EmbeddedConstatations.changeset(
-        socket.assigns.constatations,
-        params["constatations"]
-      )
+  def handle_event("save", %{"constatations" => constatations_params}, socket) do
+    case Races.bulk_update_constatations(socket.assigns.changeset.data, constatations_params) do
+      :ok ->
+        {:noreply, socket |> init_assigns()}
 
-    IO.inspect(changeset)
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, :changeset, changeset)}
+    end
+  end
 
-    {:noreply, assign(socket, :changeset, changeset)}
+  defp init_assigns(%{assigns: %{category: category, race: race}} = socket) do
+    rows = Races.get_category_participations(race, category)
+    participations = Enum.map(rows, fn %{participation: participation} -> participation end)
+    changeset = Races.change_constatations(race.release_date, participations)
+
+    socket
+    |> assign(:rows, rows)
+    |> assign(:changeset, changeset)
   end
 
   def with_form(rows, forms) do
