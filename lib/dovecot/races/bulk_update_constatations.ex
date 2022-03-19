@@ -1,7 +1,6 @@
 defmodule Dovecot.Races.BulkUpdateConstatations do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Ecto.Changeset
   alias Dovecot.Races.RelativeDateTime
   alias Dovecot.Races.Participation
 
@@ -42,14 +41,14 @@ defmodule Dovecot.Races.BulkUpdateConstatations do
     |> cast(params, [:relative_datetime])
   end
 
-  def to_participation_changesets(%Changeset{changes: %{values: constatation_changesets}}) do
+  def to_participation_changesets(constatation_changesets) do
     constatation_changesets
-    |> Enum.filter(&match?(%{changes: %{relative_datetime: _}}, &1))
-    |> Enum.map(fn %{changes: changes, data: data} ->
-      constatation = RelativeDateTime.get_datetime(data.start_date, changes.relative_datetime)
+    |> Enum.filter(fn changeset -> fetch_change(changeset, :relative_datetime) != :error end)
+    |> Enum.map(fn changeset ->
+      relative_datetime = fetch_change!(changeset, :relative_datetime)
+      constatation = RelativeDateTime.get_datetime(changeset.data.start_date, relative_datetime)
 
-      data.participation
-      |> change(constatation: constatation)
+      change(changeset.data.participation, constatation: constatation)
     end)
   end
 end

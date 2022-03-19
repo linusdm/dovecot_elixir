@@ -24,6 +24,9 @@ defmodule DovecotWeb.RaceLive.CategoryComponent do
       :ok ->
         {:noreply, push_redirect(socket, to: socket.assigns.path)}
 
+      {:nochange, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, :changeset, changeset)}
+
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :changeset, changeset)}
     end

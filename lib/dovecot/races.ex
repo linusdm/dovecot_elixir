@@ -152,18 +152,21 @@ defmodule Dovecot.Races do
 
   def bulk_update_constatations(%BulkUpdateConstatations{} = bulk_update, attrs) do
     case BulkUpdateConstatations.changeset(bulk_update, attrs) do
-      %Ecto.Changeset{valid?: true, changes: %{values: _constatation_changesets}} = changeset ->
-        BulkUpdateConstatations.to_participation_changesets(changeset)
-        |> Enum.with_index()
-        |> Enum.reduce(Multi.new(), fn {changeset, index}, multi ->
-          Multi.update(multi, {:constatation, index}, changeset)
-        end)
-        |> Repo.transaction()
+      %Ecto.Changeset{valid?: true} = changeset ->
+        case Ecto.Changeset.fetch_change(changeset, :values) do
+          {:ok, constatation_changesets} ->
+            BulkUpdateConstatations.to_participation_changesets(constatation_changesets)
+            |> Enum.with_index()
+            |> Enum.reduce(Multi.new(), fn {changeset, index}, multi ->
+              Multi.update(multi, {:constatation, index}, changeset)
+            end)
+            |> Repo.transaction()
 
-        :ok
+            :ok
 
-      %Ecto.Changeset{valid?: true} ->
-        :ok
+          :error ->
+            {:nochange, changeset}
+        end
 
       changeset ->
         {:error, changeset}
