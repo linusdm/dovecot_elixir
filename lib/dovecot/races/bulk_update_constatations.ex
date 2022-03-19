@@ -46,17 +46,7 @@ defmodule Dovecot.Races.BulkUpdateConstatations do
     constatation_changesets
     |> Enum.filter(&match?(%{changes: %{relative_datetime: _}}, &1))
     |> Enum.map(fn %{changes: changes, data: data} ->
-      constatation =
-        case changes.relative_datetime do
-          nil ->
-            nil
-
-          %RelativeDateTime{} = relative_datetime ->
-            RelativeDateTime.get_datetime(
-              data.start_date,
-              relative_datetime
-            )
-        end
+      constatation = RelativeDateTime.get_datetime(data.start_date, changes.relative_datetime)
 
       data.participation
       |> change(constatation: constatation)

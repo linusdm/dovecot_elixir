@@ -31,6 +31,8 @@ defmodule Dovecot.Races.RelativeDateTime do
     }
   end
 
+  def get_datetime(_, nil), do: nil
+
   def get_datetime(%Date{} = start_date, %__MODULE__{} = relative_datetime) do
     start_date
     |> Date.add(relative_datetime.days)
