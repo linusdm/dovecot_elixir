@@ -9,9 +9,9 @@
           <th>constatation</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id={"category_component_#{@category}"} phx-hook="Sortable">
         <%= for {row, fp} <- with_form(@rows, inputs_for(f, :values)) do %>
-          <tr>
+          <tr draggable="true" class="sortable">
             <td><%= row.category_participation.rank %></td>
             <td><%= row.pigeon.ring %></td>
             <td><%= row.pigeon.name %></td>

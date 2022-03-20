@@ -155,12 +155,13 @@ defmodule Dovecot.Races do
       %Ecto.Changeset{valid?: true} = changeset ->
         case Ecto.Changeset.fetch_change(changeset, :values) do
           {:ok, constatation_changesets} ->
-            BulkUpdateConstatations.to_participation_changesets(constatation_changesets)
-            |> Enum.with_index()
-            |> Enum.reduce(Multi.new(), fn {changeset, index}, multi ->
-              Multi.update(multi, {:constatation, index}, changeset)
-            end)
-            |> Repo.transaction()
+            {:ok, _} =
+              BulkUpdateConstatations.to_participation_changesets(constatation_changesets)
+              |> Enum.with_index()
+              |> Enum.reduce(Multi.new(), fn {changeset, index}, multi ->
+                Multi.update(multi, {:constatation, index}, changeset)
+              end)
+              |> Repo.transaction()
 
             :ok
 
@@ -171,5 +172,29 @@ defmodule Dovecot.Races do
       changeset ->
         {:error, changeset}
     end
+  end
+
+  def move_category_participation(%CategoryParticipation{} = from, %CategoryParticipation{} = to) do
+    shift_query =
+      from cp in get_shift_update_query(from.rank, to.rank),
+        where: cp.race_id == ^from.race_id and cp.category == ^from.category
+
+    {:ok, _} =
+      Multi.new()
+      |> Multi.update_all(:shift, shift_query, [])
+      |> Multi.update(:from, Ecto.Changeset.change(from, rank: to.rank))
+      |> Repo.transaction()
+  end
+
+  defp get_shift_update_query(from, to) when from < to do
+    from cp in CategoryParticipation,
+      where: cp.rank > ^from and cp.rank <= ^to,
+      update: [inc: [rank: -1]]
+  end
+
+  defp get_shift_update_query(from, to) when from >= to do
+    from cp in CategoryParticipation,
+      where: cp.rank < ^from and cp.rank >= ^to,
+      update: [inc: [rank: 1]]
   end
 end
