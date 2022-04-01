@@ -40,7 +40,7 @@ defmodule DovecotWeb.RaceLive.CategoryComponent do
     {:noreply, socket |> put_flash(:info, "moved!") |> push_redirect(to: socket.assigns.path)}
   end
 
-  defp init_assigns(%{assigns: %{category: category, race: race}} = socket) do
+  defp init_assigns(%{assigns: %{myself: myself, category: category, race: race}} = socket) do
     rows = Races.get_category_participations(race, category)
     participations = Enum.map(rows, fn %{participation: participation} -> participation end)
     changeset = Races.change_constatations(race.release_date, participations)
@@ -48,9 +48,18 @@ defmodule DovecotWeb.RaceLive.CategoryComponent do
     socket
     |> assign(:rows, rows)
     |> assign(:changeset, changeset)
+    |> assign(
+      :constatation_form,
+      Phoenix.HTML.FormData.to_form(changeset,
+        id: "constatation_form_#{myself}",
+        as: "constatations"
+      )
+    )
   end
 
-  def with_form(rows, forms) do
-    Enum.zip(rows, forms)
+  def hidden_inputs_in_parent_form_for(form, parent_form) do
+    Enum.map(form.hidden, fn {k, v} ->
+      hidden_input(form, k, form: parent_form.id, value: v)
+    end)
   end
 end

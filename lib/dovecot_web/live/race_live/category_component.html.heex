@@ -1,38 +1,38 @@
 <div>
-  <.form let={f} for={@changeset} as="constatations" phx-submit="save" phx-target={@myself}>
-    <table>
-      <thead>
-        <tr>
-          <th>rank</th>
-          <th>ring</th>
-          <th>name</th>
-          <th>constatation</th>
+  <.form id={@constatation_form.id} for={@changeset} as="constatations" phx-submit="save" phx-target={@myself}></.form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>rank</th>
+        <th>ring</th>
+        <th>name</th>
+        <th>constatation</th>
+      </tr>
+    </thead>
+    <tbody id={"category_component_#{@category}"} phx-hook="Sortable">
+      <%= for {row, f} <- Enum.zip(@rows, inputs_for(@constatation_form, :values)) do %>
+        <tr draggable="true" class="sortable">
+          <td><%= row.category_participation.rank %></td>
+          <td><%= row.pigeon.ring %></td>
+          <td><%= row.pigeon.name %></td>
+          <td>
+            <%= hidden_inputs_in_parent_form_for(f, @constatation_form) %>
+            <%= text_input f, :relative_datetime, placeholder: "d hh:mm:ss", form: @constatation_form.id %>
+            <%= error_tag_for_embedded f, :relative_datetime %>
+          </td>
         </tr>
-      </thead>
-      <tbody id={"category_component_#{@category}"} phx-hook="Sortable">
-        <%= for {row, fp} <- with_form(@rows, inputs_for(f, :values)) do %>
-          <tr draggable="true" class="sortable">
-            <td><%= row.category_participation.rank %></td>
-            <td><%= row.pigeon.ring %></td>
-            <td><%= row.pigeon.name %></td>
-            <td>
-              <%= hidden_inputs_for(fp) %>
-              <%= text_input fp, :relative_datetime, placeholder: "d hh:mm:ss" %>
-              <%= error_tag_for_embedded fp, :relative_datetime %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-      <tfoot>
+      <% end %>
+    </tbody>
+    <tfoot>
         <tr>
           <td></td>
           <td></td>
           <td></td>
           <td>
-            <%= submit "Save", phx_disable_with: "Saving..." %>
+            <%= submit "Save", phx_disable_with: "Saving...", form: @constatation_form.id %>
           </td>
         </tr>
-      </tfoot>
-    </table>
-  </.form>
+    </tfoot>
+  </table>
 </div>
