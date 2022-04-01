@@ -15,6 +15,7 @@ import Dovecot.Factory
 loft = insert(:loft, %{name: "test loft"})
 insert(:user, %{email: "some@email.com", password: "hello Dovecot!", loft_id: loft.loft_id})
 
+rayons = insert_list(3, :rayon, %{loft_id: loft.loft_id})
 pigeons = insert_list(5, :pigeon, %{loft_id: loft.loft_id})
 
 race = insert(:race, %{loft_id: loft.loft_id})
@@ -30,5 +31,16 @@ for {pigeon, rank} <- Enum.with_index(pigeons, 1), category <- [:jong, :jaarling
     pigeon: pigeon,
     category: category,
     rank: rank
+  })
+end
+
+for pigeon <- pigeons, category <- [:jong, :jaarling, :oud], rayon <- rayons do
+  insert(:price, %{
+    loft_id: loft.loft_id,
+    race_id: race.id,
+    pigeon_id: pigeon.id,
+    category: category,
+    rayon_id: rayon.id,
+    price: Enum.random(1..5000)
   })
 end

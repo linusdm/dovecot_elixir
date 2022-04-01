@@ -32,13 +32,6 @@ defmodule Dovecot.Repo.Migrations.CreateCategoryParticipations do
             "ALTER TABLE races_category_participations
              DROP CONSTRAINT IF EXISTS races_category_participations_loft_id_race_id_category_rank_index"
 
-    create unique_index(:races_category_participations, [
-             :loft_id,
-             :race_id,
-             :pigeon_id,
-             :category
-           ])
-
     create index(:races_category_participations, [:loft_id])
     create index(:races_category_participations, [:race_id])
     create index(:races_category_participations, [:pigeon_id])

@@ -3,7 +3,6 @@ defmodule Dovecot.Pigeons.Pigeon do
   import Ecto.Changeset
 
   @primary_key {:id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
   schema "pigeons" do
     field :loft_id, :binary_id
     field :name, :string

@@ -15,6 +15,7 @@ defmodule Dovecot.Repo.Migrations.CreateRayons do
     end
 
     create unique_index(:rayons, [:loft_id, :name])
+    create unique_index(:rayons, [:loft_id, :id])
     create index(:rayons, [:loft_id])
   end
 end

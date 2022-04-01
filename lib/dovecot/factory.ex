@@ -43,4 +43,10 @@ defmodule Dovecot.Factory do
       rank: 1
     }
   end
+
+  def price_factory do
+    %Dovecot.Races.Price{
+      price: 1
+    }
+  end
 end

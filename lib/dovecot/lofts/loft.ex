@@ -3,7 +3,6 @@ defmodule Dovecot.Lofts.Loft do
   import Ecto.Changeset
 
   @primary_key {:loft_id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
   schema "lofts" do
     field :name, :string
 

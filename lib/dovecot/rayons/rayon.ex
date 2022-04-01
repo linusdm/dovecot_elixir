@@ -3,7 +3,6 @@ defmodule Dovecot.Rayons.Rayon do
   import Ecto.Changeset
 
   @primary_key {:id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
   schema "rayons" do
     field :loft_id, :binary_id
     field :name, :string
