@@ -32,7 +32,12 @@ defmodule Dovecot.Repo.Migrations.CreateRacesPrices do
       timestamps()
     end
 
-    create unique_index(:races_prices, [:loft_id, :race_id, :category, :rayon_id, :price])
+    # create unique_index(:races_prices, [:loft_id, :race_id, :category, :rayon_id, :price])
+    execute "ALTER TABLE races_prices ADD CONSTRAINT races_prices_loft_id_race_id_category_rayon_id_price_index
+             UNIQUE (loft_id, race_id, category, rayon_id, price)
+             DEFERRABLE INITIALLY DEFERRED",
+            "ALTER TABLE races_prices
+             DROP CONSTRAINT IF EXISTS races_prices_loft_id_race_id_category_rayon_id_price_index"
 
     create index(:races_prices, [:loft_id])
     create index(:races_prices, [:race_id])

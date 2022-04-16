@@ -1,5 +1,10 @@
 <div>
-  <.form id={@constatation_form.id} for={@changeset} as="constatations" phx-submit="save" phx-target={@myself}></.form>
+  <.form id={@constatations_form.id} for={@constatations_changeset} as={@constatations_form.name} phx-submit="save" phx-target={@myself}></.form>
+  <%= for {rayon, %{form: form, changeset: changeset}} <- @prices_changesets_and_forms do %>
+    <.form let={f} id={form.id} for={changeset} as={form.name} phx-submit="save" phx-target={@myself}>
+      <%= hidden_input f, :rayon_id, value: rayon.id %>
+    </.form>
+  <% end %>
 
   <table>
     <thead>
@@ -8,19 +13,32 @@
         <th>ring</th>
         <th>name</th>
         <th>constatation</th>
+        <%= for {rayon, _} <- @prices_changesets_and_forms do %>
+          <th><%= rayon.name %></th>
+        <% end %>
       </tr>
     </thead>
     <tbody id={"category_component_#{@category}"} phx-hook="Sortable">
-      <%= for {row, f} <- Enum.zip(@rows, inputs_for(@constatation_form, :values)) do %>
+      <%= for {row, constatation_form, price_forms} <- Enum.zip([@rows, inputs_for(@constatations_form, :values), to_price_form_per_pigeon(@prices_changesets_and_forms)]) do %>
         <tr draggable="true" class="sortable">
           <td><%= row.category_participation.rank %></td>
           <td><%= row.pigeon.ring %></td>
           <td><%= row.pigeon.name %></td>
           <td>
-            <%= hidden_inputs_in_parent_form_for(f, @constatation_form) %>
-            <%= text_input f, :relative_datetime, placeholder: "d hh:mm:ss", form: @constatation_form.id %>
-            <%= error_tag_for_embedded f, :relative_datetime %>
+            <%= hidden_inputs_in_parent_form_for(constatation_form, @constatations_form) %>
+            <%= text_input constatation_form, :relative_datetime, placeholder: "d hh:mm:ss", form: @constatations_form.id %>
+            <%= error_tag_for_embedded constatation_form, :relative_datetime %>
           </td>
+          <%= for %{bulk_form: bulk_form, price_form: price_form} <- price_forms do %>
+            <td>
+              <%= hidden_inputs_in_parent_form_for(price_form, bulk_form) %>
+              <%= inputs_for price_form, :price, fn f -> %>
+                <%= hidden_inputs_in_parent_form_for(f, bulk_form) %>
+                <%= number_input f, :price, form: bulk_form.id %>
+                <%= error_tag_for_embedded f, :price %>
+              <% end %>
+            </td>
+          <% end %>
         </tr>
       <% end %>
     </tbody>
@@ -30,8 +48,11 @@
           <td></td>
           <td></td>
           <td>
-            <%= submit "Save", phx_disable_with: "Saving...", form: @constatation_form.id %>
+            <%= submit "Save", form: @constatations_form.id %>
           </td>
+          <%= for {_, %{form: form}} <- @prices_changesets_and_forms do %>
+            <td><%= submit "Save", form: form.id %></td>
+          <% end %>
         </tr>
     </tfoot>
   </table>

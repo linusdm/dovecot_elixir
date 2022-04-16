@@ -7,6 +7,7 @@ defmodule Dovecot.Races do
   alias Ecto.Multi
   alias Dovecot.Repo
   alias Dovecot.Races.BulkUpdateConstatations
+  alias Dovecot.Races.BulkUpdatePrices
 
   alias Dovecot.Races.{Race, Participation, CategoryParticipation}
 
@@ -145,6 +146,65 @@ defmodule Dovecot.Races do
     |> Repo.all()
   end
 
+  def change_prices(%Race{id: race_id}, category, attrs \\ %{}) do
+    from(cp in CategoryParticipation,
+      where: cp.race_id == ^race_id,
+      where: cp.category == ^category,
+      join: r in Dovecot.Rayons.Rayon,
+      on: [loft_id: cp.loft_id],
+      left_join: p in Dovecot.Races.Price,
+      on: [
+        loft_id: cp.loft_id,
+        race_id: cp.race_id,
+        pigeon_id: cp.pigeon_id,
+        category: cp.category,
+        rayon_id: r.id
+      ],
+      order_by: cp.rank,
+      select: %{
+        rayon: r,
+        bulk_update_price: %BulkUpdatePrices.Price{pigeon_id: cp.pigeon_id, price: p}
+      }
+    )
+    |> Repo.all()
+    |> Enum.group_by(& &1.rayon, & &1.bulk_update_price)
+    |> Enum.into(%{}, fn {rayon, prices} ->
+      {rayon,
+       BulkUpdatePrices.create(prices, Dovecot.Repo.get_loft_id(), race_id, category, rayon.id)
+       |> BulkUpdatePrices.changeset(attrs)}
+    end)
+  end
+
+  def bulk_update_prices(%BulkUpdatePrices{} = bulk_update, attrs) do
+    case BulkUpdatePrices.changeset(bulk_update, attrs) do
+      %Ecto.Changeset{valid?: true} = changeset ->
+        case BulkUpdatePrices.to_price_changesets(changeset) do
+          [] ->
+            :ok
+
+          price_changesets ->
+            {:ok, _} =
+              price_changesets
+              |> Enum.with_index()
+              |> Enum.reduce(Multi.new(), fn {changeset, index}, multi ->
+                case Ecto.Changeset.fetch_change!(changeset, :price) do
+                  nil ->
+                    Multi.delete(multi, index, changeset)
+
+                  _ ->
+                    Multi.insert_or_update(multi, index, changeset)
+                end
+              end)
+              |> Repo.transaction()
+
+            :ok
+        end
+
+      changeset ->
+        {:error, changeset}
+    end
+  end
+
   def change_constatations(%Date{} = start_date, participations, attrs \\ %{}) do
     BulkUpdateConstatations.create(start_date, participations)
     |> BulkUpdateConstatations.changeset(attrs)
@@ -153,20 +213,20 @@ defmodule Dovecot.Races do
   def bulk_update_constatations(%BulkUpdateConstatations{} = bulk_update, attrs) do
     case BulkUpdateConstatations.changeset(bulk_update, attrs) do
       %Ecto.Changeset{valid?: true} = changeset ->
-        case Ecto.Changeset.fetch_change(changeset, :values) do
-          {:ok, constatation_changesets} ->
+        case BulkUpdateConstatations.to_participation_changesets(changeset) do
+          [] ->
+            :ok
+
+          constatation_changesets ->
             {:ok, _} =
-              BulkUpdateConstatations.to_participation_changesets(constatation_changesets)
+              constatation_changesets
               |> Enum.with_index()
               |> Enum.reduce(Multi.new(), fn {changeset, index}, multi ->
-                Multi.update(multi, {:constatation, index}, changeset)
+                Multi.update(multi, index, changeset)
               end)
               |> Repo.transaction()
 
             :ok
-
-          :error ->
-            {:nochange, changeset}
         end
 
       changeset ->

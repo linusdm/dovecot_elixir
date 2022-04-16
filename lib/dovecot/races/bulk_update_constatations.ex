@@ -36,19 +36,24 @@ defmodule Dovecot.Races.BulkUpdateConstatations do
     |> cast_embed(:values, with: &child_changeset/2)
   end
 
-  defp child_changeset(schema, params) do
-    schema
-    |> cast(params, [:relative_datetime])
-  end
+  defp child_changeset(schema, params), do: cast(schema, params, [:relative_datetime])
 
-  def to_participation_changesets(constatation_changesets) do
-    constatation_changesets
-    |> Enum.filter(fn changeset -> fetch_change(changeset, :relative_datetime) != :error end)
-    |> Enum.map(fn changeset ->
-      relative_datetime = fetch_change!(changeset, :relative_datetime)
-      constatation = RelativeDateTime.get_datetime(changeset.data.start_date, relative_datetime)
+  def to_participation_changesets(bulk_update_changeset) do
+    case Ecto.Changeset.fetch_change(bulk_update_changeset, :values) do
+      {:ok, constatation_changesets} ->
+        constatation_changesets
+        |> Enum.filter(&match?({:ok, _}, fetch_change(&1, :relative_datetime)))
+        |> Enum.map(fn changeset ->
+          relative_datetime = fetch_change!(changeset, :relative_datetime)
 
-      change(changeset.data.participation, constatation: constatation)
-    end)
+          constatation =
+            RelativeDateTime.get_datetime(changeset.data.start_date, relative_datetime)
+
+          change(changeset.data.participation, constatation: constatation)
+        end)
+
+      :error ->
+        []
+    end
   end
 end
